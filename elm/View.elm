@@ -1,5 +1,6 @@
 module View exposing (..)
 
+import Api exposing (User)
 import LoginTypes as Login
 
 type alias Session =
@@ -8,6 +9,6 @@ type alias Session =
 
 type View = MainView Session | CounterView Session | LoginView Login.State
 
-login : String -> View
-login name =
-    MainView {name = name}
+login : User -> View
+login user =
+    MainView {name = user.username}

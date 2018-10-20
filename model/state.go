@@ -54,3 +54,18 @@ func RegisterUser(username, email, password string) (*User, error) {
 	userByEmail[email] = user
 	return user, nil
 }
+
+var (
+	defaultUsers = []User{
+		{Username: "setup", Email: "setup@setup.com", password: "default"},
+		{Username: "mike", Email: "mike@mike.com", password: "password"},
+		{Username: "test", Email: "test@test.com", password: "test"},
+	}
+)
+
+func init() {
+	for idx, u := range defaultUsers {
+		userByUsername[u.Username] = &defaultUsers[idx]
+		userByEmail[u.Email] = &defaultUsers[idx]
+	}
+}

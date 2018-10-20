@@ -1,5 +1,12 @@
 module LoginTypes exposing (..)
 
-type Msg = NameInput String | PasswordInput String | LoginClick
+import Api
+import Http
 
-type alias State = {name : String, password : String, bad : Bool}
+type Msg
+    = EmailInput String
+    | PasswordInput String
+    | LoginClick
+    | LoginResponse (Result Http.Error Api.User)
+
+type alias State = {email : String, password : String, errors : List String, requested : Bool}

@@ -24,23 +24,27 @@ var (
 	}
 )
 
-func validationFailed(w http.ResponseWriter, msg string, err error) {
+func validationFailed(w http.ResponseWriter, msgs ...string) {
 	w.WriteHeader(http.StatusUnprocessableEntity)
-	if err != nil {
-		msg = fmt.Sprintf("%s: %s", msg, err)
+	fmt.Fprint(w, `{"errors":{"body":[`)
+	for idx, msg := range msgs {
+		if idx > 0 {
+			fmt.Fprint(w, ", ")
+		}
+		fmt.Fprintf(w, "%q", msg)
 	}
-	fmt.Fprintf(w, `{"errors":{"body":["%s"]}}`, msg)
+	fmt.Fprint(w, "]}}")
 }
 
 func fileHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method != http.MethodGet {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
 	n, ok := staticFiles[req.URL.Path]
 	if !ok {
 		http.NotFound(w, req)
+		return
+	}
+
+	if req.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -74,30 +78,30 @@ type respUser struct {
 }
 
 func loginHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
 	if req.URL.Path != loginPath {
 		http.NotFound(w, req)
+		return
+	}
+	if req.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
 	var reqLogin reqLogin
 	err := json.NewDecoder(req.Body).Decode(&reqLogin)
 	if err != nil {
-		validationFailed(w, "login json decode", err)
+		validationFailed(w, err.Error())
 		return
 	}
 	defer req.Body.Close()
 
 	if reqLogin.User == nil {
-		validationFailed(w, "login json decode: missing user", nil)
+		validationFailed(w, "json is missing user field")
 		return
 	}
 	user := model.LoginUser(reqLogin.User.Email, reqLogin.User.Password)
 	if user == nil {
-		validationFailed(w, "login: bad email or password", nil)
+		validationFailed(w, "email or password is invalid")
 		return
 	}
 
@@ -117,31 +121,31 @@ type reqRegister struct {
 }
 
 func registerHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
 	if req.URL.Path != registerPath {
 		http.NotFound(w, req)
+		return
+	}
+	if req.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
 	var reqRegister reqRegister
 	err := json.NewDecoder(req.Body).Decode(&reqRegister)
 	if err != nil {
-		validationFailed(w, "register json decode", err)
+		validationFailed(w, err.Error())
 		return
 	}
 	defer req.Body.Close()
 
 	if reqRegister.User == nil {
-		validationFailed(w, "register json decode: missing user", nil)
+		validationFailed(w, "json is missing user field")
 		return
 	}
 	user, err := model.RegisterUser(reqRegister.User.Username, reqRegister.User.Email,
 		reqRegister.User.Password)
 	if err != nil {
-		validationFailed(w, "register", err)
+		validationFailed(w, err.Error())
 		return
 	}
 

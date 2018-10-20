@@ -1,5 +1,11 @@
 module Main exposing (main)
 
+{-
+To Do:
+- Login: display errors above the email prompt
+- Login: keep track if a login request is in progress, and disable input controls if so
+-}
+
 import Browser
 import Counter
 import Html exposing (..)
