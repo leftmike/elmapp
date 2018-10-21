@@ -2,11 +2,9 @@ module Main exposing (main)
 
 {-
 To Do:
-- Login: display errors above the email prompt
-- Login: keep track if a login request is in progress, and disable input controls if so
 -}
 
-import Browser
+import Browser exposing (Document)
 import Counter
 import Html exposing (..)
 import Html.Events as Events
@@ -16,7 +14,7 @@ import Model exposing (..)
 import View
 
 main =
-    Browser.element {init = init, update = update, view = view, subscriptions = subscriptions}
+    Browser.document {init = init, update = update, view = view, subscriptions = subscriptions}
 
 init : () -> (Model, Cmd Msg)
 init _ = (
@@ -35,19 +33,23 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
 
-view : Model -> Html Msg
+view : Model -> Document Msg
 view model =
     case model.activeView of
         View.MainView session -> viewWithSession model session viewMain
         View.CounterView session -> viewWithSession model session Counter.view
         View.LoginView state -> Login.view state
 
-viewWithSession : Model -> View.Session -> (Model -> Html Msg) -> Html Msg
+viewWithSession : Model -> View.Session -> (Model -> Html Msg) -> Document Msg
 viewWithSession model session v =
-    div []
-        [ viewHeader model session
-        , v model
-        ]
+    { title = "Elm App"
+    , body =
+        [ div []
+             [ viewHeader model session
+             , v model
+             ]
+         ]
+    }
 
 viewHeader : Model -> View.Session -> Html Msg
 viewHeader model session =

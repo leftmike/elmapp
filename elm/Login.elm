@@ -1,10 +1,11 @@
 module Login exposing (init, update, view)
 
 import Api
+import Browser exposing (Document)
 import Dict
 import LoginTypes as Types
 import Html exposing (..)
-import Html.Attributes as Attributes
+import Html.Attributes exposing (..)
 import Html.Events as Events
 import Http
 import Message exposing (Msg(..))
@@ -63,24 +64,38 @@ passwordInput = Types.PasswordInput >> UpdateLogin
 loginClick = UpdateLogin Types.LoginClick
 loginResponse = Types.LoginResponse >> UpdateLogin
 
-view : Types.State -> Html Msg
+view : Types.State -> Document Msg
 view state =
-    div []
-        [ div [] [ text "Sign in" ]
-        , div [] [ text "Need an account?" ]
-        , viewErrors state.errors
-        , viewInput "Email" "text" state.email emailInput
-        , viewInput "Password" "password" state.password passwordInput
-        , button [ Events.onClick loginClick ] [ text "Sign in" ]
+    { title = "Elm App - Login"
+    , body =
+        [ div [ class "auth-page" ]
+            [ div [ class "container page" ]
+                [ div [ class "row" ]
+                    [ div [ class "col-md-6 offset-md-3 col-xs-12" ]
+                        [ h1 [ class "text-xs-center" ] [ text "Sign in" ]
+                        , p [ class "text-xs-center" ] [ text "Need an account?" ]
+                        , viewErrors state.errors
+                        , viewInput "Email" "text" state.email emailInput
+                        , viewInput "Password" "password" state.password passwordInput
+                        , button
+                            [ class "btn btn-lg btn-primary pull-xs-right"
+                            , Events.onClick loginClick
+                            ] [ text "Sign in" ]
+                        ]
+                    ]
+                ]
+            ]
         ]
+    }
 
 viewInput : String -> String -> String -> (String -> Msg) -> Html Msg
-viewInput placeholder type_ value event =
-    div []
+viewInput place typ val event =
+    fieldset [ class "form-group" ]
         [ input
-            [ Attributes.type_ type_
-            , Attributes.value value
-            , Attributes.placeholder placeholder
+            [ class "form-control form-control-lg"
+            , type_ typ
+            , value val
+            , placeholder place
             , Events.onInput event
             ] []
         ]
@@ -90,7 +105,7 @@ viewErrors errors =
     if List.isEmpty errors then
         text ""
     else
-        ul [ Attributes.style "color" "red" ] (List.map viewError errors)
+        ul [ class "error-messages" ] (List.map viewError errors)
 
 viewError : String -> Html Msg
 viewError error =

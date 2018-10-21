@@ -21,6 +21,7 @@ var (
 	staticFiles = map[string]string{
 		"/":           "index.html",
 		"/index.html": "index.html",
+		"/elm.js":     "elm.js",
 	}
 )
 
@@ -37,6 +38,8 @@ func validationFailed(w http.ResponseWriter, msgs ...string) {
 }
 
 func fileHandler(w http.ResponseWriter, req *http.Request) {
+	fmt.Printf("file: %s\n", req.URL.Path)
+
 	n, ok := staticFiles[req.URL.Path]
 	if !ok {
 		http.NotFound(w, req)
