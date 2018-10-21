@@ -1,7 +1,6 @@
-module Login exposing (init, update, view)
+module Login exposing (init, update, view, title)
 
 import Api
-import Browser exposing (Document)
 import Dict
 import LoginTypes as Types
 import Html exposing (..)
@@ -64,29 +63,29 @@ passwordInput = Types.PasswordInput >> UpdateLogin
 loginClick = UpdateLogin Types.LoginClick
 loginResponse = Types.LoginResponse >> UpdateLogin
 
-view : Types.State -> Document Msg
+title : Types.State -> String
+title state =
+    "Login"
+
+view : Types.State -> Html Msg
 view state =
-    { title = "Elm App - Login"
-    , body =
-        [ div [ class "auth-page" ]
-            [ div [ class "container page" ]
-                [ div [ class "row" ]
-                    [ div [ class "col-md-6 offset-md-3 col-xs-12" ]
-                        [ h1 [ class "text-xs-center" ] [ text "Sign in" ]
-                        , p [ class "text-xs-center" ] [ text "Need an account?" ]
-                        , viewErrors state.errors
-                        , viewInput "Email" "text" state.email emailInput
-                        , viewInput "Password" "password" state.password passwordInput
-                        , button
-                            [ class "btn btn-lg btn-primary pull-xs-right"
-                            , Events.onClick loginClick
-                            ] [ text "Sign in" ]
-                        ]
+    div [ class "auth-page" ]
+        [ div [ class "container page" ]
+            [ div [ class "row" ]
+                [ div [ class "col-md-6 offset-md-3 col-xs-12" ]
+                    [ h1 [ class "text-xs-center" ] [ text "Sign in" ]
+                    , p [ class "text-xs-center" ] [ text "Need an account?" ]
+                    , viewErrors state.errors
+                    , viewInput "Email" "text" state.email emailInput
+                    , viewInput "Password" "password" state.password passwordInput
+                    , button
+                        [ class "btn btn-lg btn-primary pull-xs-right"
+                        , Events.onClick loginClick
+                        ] [ text "Sign in" ]
                     ]
                 ]
             ]
         ]
-    }
 
 viewInput : String -> String -> String -> (String -> Msg) -> Html Msg
 viewInput place typ val event =
