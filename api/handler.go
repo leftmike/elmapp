@@ -145,10 +145,10 @@ func registerHandler(w http.ResponseWriter, req *http.Request) {
 		validationFailed(w, "json is missing user field")
 		return
 	}
-	user, err := model.RegisterUser(reqRegister.User.Username, reqRegister.User.Email,
+	user, msgs := model.RegisterUser(reqRegister.User.Username, reqRegister.User.Email,
 		reqRegister.User.Password)
-	if err != nil {
-		validationFailed(w, err.Error())
+	if msgs != nil {
+		validationFailed(w, msgs...)
 		return
 	}
 

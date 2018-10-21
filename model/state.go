@@ -1,7 +1,6 @@
 package model
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -35,15 +34,24 @@ func LoginUser(email, password string) *User {
 	return user
 }
 
-func RegisterUser(username, email, password string) (*User, error) {
+func RegisterUser(username, email, password string) (*User, []string) {
+	var ret []string
+
 	if _, ok := userByUsername[username]; ok {
 		fmt.Printf("register user: username %s already registered\n", username)
-		return nil, errors.New("username already registered")
+		ret = append(ret, "username has already been taken")
 	}
 	if _, ok := userByEmail[email]; ok {
 		fmt.Printf("register user: email address %s already registered\n", email)
-		return nil, errors.New("email address already registered")
+		ret = append(ret, "email has already been taken")
 	}
+	if len(password) < 8 {
+		ret = append(ret, "password is too short (minimum is 8 characters)")
+	}
+	if ret != nil {
+		return nil, ret
+	}
+
 	fmt.Printf("register user: %s %s %s SUCCEEDED\n", username, email, password)
 	user := &User{
 		Username: username,
